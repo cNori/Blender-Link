@@ -1,0 +1,22 @@
+Types:
+AM	= Animature + Model
+A	= Animation
+M	= Model
+
+Controls:
+X	= Dont export
+O	= Export
+-...	= Sub Data Marker
+-	= Data Marker
+
+
+Data storage
+<Sub Data Markers><Control:ExportFlag><spacebar char><Type><spacebar char><Name of the object>
+
+format 1 element per line
+example
+-O AM Robot
+--O A Idle
+--O A Walk
+--O A Run
+-X M FA22-4 SMG
