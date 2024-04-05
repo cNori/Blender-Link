@@ -36,11 +36,11 @@ public class BlenderLinkPlugin : EditorPlugin
             Name = "Blender Link",
             Category = "Tools",
             Description = "batch import of models and animations from single blend file,\nAPI for running scripts in blender",
-            Author = "Norite SC",
+            Author = "cNori",
             AuthorUrl = "",
-            RepositoryUrl = "",
+            RepositoryUrl = "https://github.com/cNori/Blender-Link",
             IsAlpha = true,
-            Version = new Version(0, 1, 5, 0),
+            Version = new Version(0, 2, 0, 0),
         };
     }
     /// <inheritdoc/>
