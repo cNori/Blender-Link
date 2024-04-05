@@ -62,7 +62,7 @@ public class BlenderLinkPlugin : EditorPlugin
 
         //he he no build in, overload the import entry
         ImportFileEntry.FileTypes["blend"] = Import;
-        PathToBlenderScripts = Path.Combine(Globals.ProjectFolder, "Plugins\\Blender Link\\Source\\BlenderScripts\\");
+        PathToBlenderScripts = Path.Combine(Globals.ProjectFolder, "Plugins\\Blender-Link\\Source\\BlenderScripts\\");
         Editor.Options.AddCustomSettings("Blender Link", new OptionsModule.CreateCustomSettingsDelegate(() => { return BlenderLinkOptions.Options; }));
         Editor.Options.OptionsChanged += Options_OptionsChanged;
         BlenderLinkOptions.Load();

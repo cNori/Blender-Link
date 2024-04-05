@@ -142,7 +142,7 @@ namespace BlenderLink
         {
             return new BlenderFileAssetItem(path, typeName, ref id)
             {
-                icon = Content.Load<Texture>(Path.Combine(Globals.ProjectFolder, "Plugins\\Blender Link\\Content\\BlederIcons\\Main\\blender.flax")),
+                icon = Content.Load<Texture>(Path.Combine(Globals.ProjectFolder, "Plugins\\Blender-Link\\Content\\BlederIcons\\Main\\blender.flax")),
                 acolor = AccentColor
             };
         }
@@ -448,7 +448,7 @@ namespace BlenderLink
         {
             return new BlenderFileAssetItem(path, typeName, ref id)
             {
-                icon = Content.Load<Texture>(Path.Combine(Globals.ProjectFolder, "Plugins\\Blender Link\\Content\\BlederIcons\\Main\\file_backup.flax")),
+                icon = Content.Load<Texture>(Path.Combine(Globals.ProjectFolder, "Plugins\\Blender-Link\\Content\\BlederIcons\\Main\\file_backup.flax")),
                 acolor = AccentColor
             };
         }
@@ -512,7 +512,7 @@ namespace BlenderLink
         {
             return new BlenderFileAssetItem(path, typeName, ref id)
             {
-                icon = Content.Load<Texture>(Path.Combine(Globals.ProjectFolder, "Plugins\\Blender Link\\Content\\BlederIcons\\Main\\file_script.flax")),
+                icon = Content.Load<Texture>(Path.Combine(Globals.ProjectFolder, "Plugins\\Blender-Link\\Content\\BlederIcons\\Main\\file_script.flax")),
                 acolor = AccentColor
             };
         }

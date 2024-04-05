@@ -103,10 +103,10 @@ outvall == null;
             if (Options.PathToBlender == null || Options.PathToBlender == "")
             {
                 Options.isNew = false;
-                var asset = Content.Load<Texture>(Path.Combine(Globals.ProjectFolder, "Plugins\\Blender Link\\Content\\BlenderLink.Icon.flax"));
+                var asset = Content.Load<Texture>(Path.Combine(Globals.ProjectFolder, "Plugins\\Blender-Link\\Content\\BlenderLink.Icon.flax"));
                 if(asset == null) 
                 {
-                    Platform.Error("[BlenderLink] Invalid directory to Blender Link it expect the \"Plugins\\Blender Link\"");
+                    Platform.Error("[BlenderLink] Invalid directory to Blender Link it expect the \"Plugins\\Blender-Link\"");
                     return;
                 }
                 CreateWindowSettings createWindowSettings = new CreateWindowSettings()
