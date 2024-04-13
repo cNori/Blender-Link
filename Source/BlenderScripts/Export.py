@@ -255,7 +255,7 @@ class BLTCashe:
             # Create a new directory because it does not exist
             os.makedirs(directory)
         
-        obj.data.pose_position = 'REST'
+        anima.data.pose_position = 'REST'
         bpy.ops.export_scene.fbx(
         filepath= os.path.join(directory, anima.name.replace(".", "_")) + ".fbx",
         use_selection=True,
