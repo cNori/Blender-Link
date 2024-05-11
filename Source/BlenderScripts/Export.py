@@ -33,11 +33,13 @@ class Line:
         self.ObjectName = ""
         self.parent = None
         self.Object = None
+        self.SpectialData = ""
     def set(self,DataMarker,Import,Type,ObjectName):
         self.DataMarker = DataMarker
         self.Import = Import
         self.Type = Type
         self.ObjectName = ObjectName
+        self.SpectialData = ""
         return self
 
     @staticmethod
@@ -50,10 +52,17 @@ class Line:
 
                 output.Import = line[i] == 'O'
                 i += 2
-                skip = line.index(' ', i)
+                skip = line.find(' ', i)
                 output.Type = line[i:skip]
-                i += skip - i + 1
-                output.ObjectName = line[i:]
+                i = skip + 1
+                skip = line.find('→', i)
+                if skip == -1:
+                    output.ObjectName = line[i:]
+                    output.SpectialData = ""
+                    break
+                output.ObjectName = line[i:skip]
+                i = skip + 1
+                output.SpectialData = line[i:]
                 break
         return output
 
@@ -66,8 +75,11 @@ class Line:
         builder.append(input.Type)
         builder.append(' ')
         builder.append(input.ObjectName)
+        if input.SpectialData != "":
+            builder.append('→')
+            builder.append(input.SpectialData)
         line = ''.join(builder)
-        print(line)
+
         return line
     def compere(self,depth,type,name):
         return self.DataMarker == depth and self.Type == type and self.ObjectName == name
@@ -158,7 +170,8 @@ class BLTCashe:
         if out.compere(depth,type,name):
             print("Found valid line")
         else:
-            print("Found Invalid line !!!!!!!")
+            print("Found invalid line: " + str(out.DataMarker) + " " + str(out.Import) + " " + str(out.Type) + " " + str(out.ObjectName) + " " + str(out.SpectialData) + " !!!")
+            print("Expected: " + str(depth) + " " + str(out.Import) + " " + str(out.Type) + " " + str(name) + " " + str(out.SpectialData) + " !!!")
         self.isAt += 1;
         return out
     
@@ -269,7 +282,7 @@ class BLTCashe:
         obj.select_set(False)
         anima.select_set(False)
         bpy.context.view_layer.objects.active = None
-        obj.data.pose_position = 'POSE'
+        anima.data.pose_position = 'POSE'
         
     def ExportClip(self,obj,clip):
         print("Exportting NlaStrip:" +clip.name)

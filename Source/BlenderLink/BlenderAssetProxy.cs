@@ -342,6 +342,13 @@ namespace BlenderLink
                             {
                                 if (hit.Import)
                                 {
+                                    if (hit.SpectialData != null && hit.Type == Line.ObjectType.ARMATURE)
+                                    {
+                                        AnimationOptions.RootMotion = ModelTool.RootMotionMode.ExtractNode;
+                                        AnimationOptions.RootMotionFlags = AnimationRootMotionFlags.RootPosition;
+                                        AnimationOptions.RootNodeName = hit.SpectialData;
+                                    }
+
                                     EDImport(Path.Combine(FolderSourcePath, item.ShortName, hit.ObjectName, "Animation", "NLA Tracks"), line.ObjectName, AnimationOptions);
                                 }
                             }
@@ -352,6 +359,13 @@ namespace BlenderLink
                             {
                                 if (hit.Import)
                                 {
+                                    if (hit.SpectialData != null && hit.Type == Line.ObjectType.ARMATURE)
+                                    {
+                                        AnimationOptions.RootMotion = ModelTool.RootMotionMode.ExtractNode;
+                                        AnimationOptions.RootMotionFlags = AnimationRootMotionFlags.RootPosition;
+                                        AnimationOptions.RootNodeName = hit.SpectialData;
+                                    }
+
                                     EDImport(Path.Combine(FolderSourcePath, item.ShortName, hit.ObjectName, "Animation", "Clips"), line.ObjectName, AnimationOptions);
                                 }
                             }
@@ -411,7 +425,18 @@ namespace BlenderLink
                 if (f != null)
                 {
                     var pathAndName = Path.Combine(to, objName.Replace(".", "_"));
-                    Editor.Instance.ContentImporting.Import(pathAndName + ".fbx", f, true, settings);
+
+                    Debug.Log(pathAndName);
+                    //
+                    var item = Editor.Instance.ContentDatabase.Find(pathAndName + ".flax");
+                    if (item is BinaryAssetItem asset)
+                    {
+                        Editor.Instance.ContentImporting.Reimport(asset, null, true);
+                    }
+                    else
+                    {
+                        Editor.Instance.ContentImporting.Import(pathAndName + ".fbx", f, true, settings);
+                    }
                     if (CreateCollisionData)
                     {
                         CookMeshCollisionQueue.Enqueue((to, pathAndName));

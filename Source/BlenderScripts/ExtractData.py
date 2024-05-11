@@ -30,11 +30,13 @@ class Line:
         self.Import = False
         self.Type = ""
         self.ObjectName = ""
-    def set(self,DataMarker,Import,Type,ObjectName):
+        self.SpectialData = ""
+    def set(self,DataMarker,Import,Type,ObjectName,SpectialData):
         self.DataMarker = DataMarker
         self.Import = Import
         self.Type = Type
         self.ObjectName = ObjectName
+        self.SpectialData = SpectialData
         return self
 
     @staticmethod
@@ -47,10 +49,17 @@ class Line:
 
                 output.Import = line[i] == 'O'
                 i += 2
-                skip = line.index(' ', i)
+                skip = line.find(' ', i)
                 output.Type = line[i:skip]
-                i += skip - i + 1
-                output.ObjectName = line[i:]
+                i = skip + 1
+                skip = line.find('→', i)
+                if skip == -1:
+                    output.ObjectName = line[i:]
+                    output.SpectialData = ""
+                    break
+                output.ObjectName = line[i:skip]
+                i = skip + 1
+                output.SpectialData = line[i:]
                 break
         return output
 
@@ -63,11 +72,14 @@ class Line:
         builder.append(input.Type)
         builder.append(' ')
         builder.append(input.ObjectName)
+        if input.SpectialData != "":
+            builder.append('→')
+            builder.append(input.SpectialData)
         line = ''.join(builder)
 
         return line
-    def compere(self,depth,type,name):
-        return self.DataMarker == depth and self.Type == type and self.ObjectName == name
+    def compere(self,depth,type,name,spectialData):
+        return self.DataMarker == depth and self.Type == type and self.ObjectName == name and self.SpectialData == spectialData
 
 class BLTCashe:
     def __init__(self):
@@ -109,7 +121,7 @@ class BLTCashe:
     
     
     def TreeToFileResursive(self,collection,depth):
-        self.AddOrSet(depth ,"COLLECTION", collection.name)
+        self.AddOrSet(depth ,"COLLECTION", collection.name,"")
         depth += 1
         for c in collection.children:
             self.TreeToFileResursive(c,depth)
@@ -118,20 +130,25 @@ class BLTCashe:
                 self.TreeGetChildren(obj,depth)
                 
     def TreeGetChildren(self, parent, depth):
-        self.AddOrSet(depth,parent.type,parent.name)
+        spectialData = ""
+        if parent.type == 'ARMATURE':
+            spectialData = parent.pose.bones[0].name
+            print("spectial data has been set")
+        self.AddOrSet(depth,parent.type,parent.name,spectialData)
+        spectialData = ""
         depth += 1
         if parent.animation_data:
-            self.AddOrSet(depth,"ANIM_DATA","Animation")
+            self.AddOrSet(depth,"ANIM_DATA","Animation",spectialData)
             if len(parent.animation_data.nla_tracks) != 0:
                 for nla_track in parent.animation_data.nla_tracks:
-                        self.AddOrSet(depth+1,"NLA_TRACK",nla_track.name)
+                        self.AddOrSet(depth+1,"NLA_TRACK",nla_track.name,spectialData)
                         for action in nla_track.strips:
                             if action.type == "META":
-                                self.AddOrSet(depth+2,"SEQ_STRIP_META",action.name)
+                                self.AddOrSet(depth+2,"SEQ_STRIP_META",action.name,spectialData)
                             else:
-                                self.AddOrSet(depth+2,action.type,action.name)
+                                self.AddOrSet(depth+2,action.type,action.name,spectialData)
             elif parent.animation_data.action:
-                self.AddOrSet(depth+1,"CLIP",parent.animation_data.action.name)
+                self.AddOrSet(depth+1,"CLIP",parent.animation_data.action.name,spectialData)
                 
         for obj in parent.children:
             self.TreeGetChildren(obj,depth)
@@ -139,14 +156,14 @@ class BLTCashe:
     def compereToCashe(self,other):
         return lines[isAt].compere(other)
         
-    def AddOrSet(self, depth, type, name):
+    def AddOrSet(self, depth, type, name,spectialData):
         if self.isAt >= len(self.lines):
-            self.lines.append(Line().set(depth,False,type,name))
+            self.lines.append(Line().set(depth,False,type,name,spectialData))
         else:
-            if self.lines[self.isAt].compere(depth,type,name):
-                self.lines[self.isAt].set(depth,self.lines[self.isAt].Import, type,name)
+            if self.lines[self.isAt].compere(depth,type,name,spectialData):
+                self.lines[self.isAt].set(depth,self.lines[self.isAt].Import, type,name,spectialData)
             else:
-                self.lines[self.isAt].set(depth,False,type,name)
+                self.lines[self.isAt].set(depth,False,type,name,spectialData)
         self.isAt += 1;
 
 

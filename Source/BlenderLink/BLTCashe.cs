@@ -161,7 +161,7 @@ namespace BlenderLink
         /// <br></br> --X MESH MultiTool
         /// <br></br> --X EMPTY Empty
         /// <br></br> ---X CAMERA Camera
-        /// <br></br> -X ARMATURE Robot
+        /// <br></br> -X ARMATURE Robot [SpectialData:RootBoneName]
         /// <br></br> --X ANIMATION Idle.001
         /// <br></br> --X ANIMATION Walk_Foroward
         /// <br></br> --X ANIMATION Walk_Foroward_Right
@@ -306,8 +306,26 @@ namespace BlenderLink
             /// </summary>
             public string ObjectName;
 
+            /// <summary>
+            /// The spectial data
+            /// </summary>
+            public string SpectialData;
+
+            /// <summary>
+            /// Gets the import CheckBox.
+            /// </summary>
+            /// <value>
+            /// The import CheckBox.
+            /// </value>
             public CheckBox ImportCheckBox { get; private set; }
+            /// <summary>
+            /// Gets the parent.
+            /// </summary>
+            /// <value>
+            /// The parent.
+            /// </value>
             public Line Parent { get; internal set; }
+
             #region Seralisation
             /// <summary>
             /// Deseralizes the specified line.
@@ -322,33 +340,47 @@ namespace BlenderLink
                     if (line[i] == '-')
                     {
                         //↓
-                        //[Sub Data Markers][Control:ExportFlag][spacebar char][Type][spacebar char][Name of the object]
+                        //[Sub Data Markers][Control:ExportFlag][spacebar char][Type][spacebar char][Name of the object][spacebar char][SpectialData]
                         output.DataMarker = i;
                     }
                     else
                     {
                         //Debug.Log(line);
                         //                  ↓
-                        //[Sub Data Markers][Control:ExportFlag][spacebar char][Type][spacebar char][Name of the object]
+                        //[Sub Data Markers][Control:ExportFlag][spacebar char][Type][spacebar char][Name of the object][spacebar char][SpectialData]
                         output.Import = line[i] == 'O';
                         i++;
                         //                                      ↓
-                        //[Sub Data Markers][Control:ExportFlag][spacebar char][Type][spacebar char][Name of the object]
+                        //[Sub Data Markers][Control:ExportFlag][spacebar char][Type][spacebar char][Name of the object][spacebar char][SpectialData]
                         i++;
                         //                                                     ↓
-                        //[Sub Data Markers][Control:ExportFlag][spacebar char][Type][spacebar char][Name of the object]
+                        //[Sub Data Markers][Control:ExportFlag][spacebar char][Type][spacebar char][Name of the object][spacebar char][SpectialData]
                         var skip = line.IndexOf(' ', i);
-                        output.Type = FromString(line.Substring(i, skip - i));
-                        i += skip - i;
+                        output.Type = FromString(line[i..skip]);
+                        i = skip;
                         //                                                           ↓
-                        //[Sub Data Markers][Control:ExportFlag][spacebar char][Type][spacebar char][Name of the object]
+                        //[Sub Data Markers][Control:ExportFlag][spacebar char][Type][spacebar char][Name of the object][spacebar char][SpectialData]
                         i++;
                         //                                                                          ↓
-                        //[Sub Data Markers][Control:ExportFlag][spacebar char][Type][spacebar char][Name of the object]
-
-                        //Debug.Log(line);
-                        output.ObjectName = line[i..];
-
+                        //[Sub Data Markers][Control:ExportFlag][spacebar char][Type][spacebar char][Name of the object][spacebar char][SpectialData]
+                        skip = line.IndexOf('→', i);
+                        if (skip == -1)
+                        {
+                            output.ObjectName = line[i..];
+                            break;
+                        }
+                        output.ObjectName = line[i..skip];
+                        i += skip - i;
+                        //                                                                                              ↓
+                        //[Sub Data Markers][Control:ExportFlag][spacebar char][Type][spacebar char][Name of the object][spacebar char][SpectialData]
+                        i++;
+                        if (i > line.Length)
+                        {
+                            break;
+                        }
+                        //                                                                                                             ↓
+                        //[Sub Data Markers][Control:ExportFlag][spacebar char][Type][spacebar char][Name of the object][spacebar char][SpectialData]
+                        output.SpectialData = line[i..];
                         break;//we are done
                     }
                 }
@@ -364,23 +396,32 @@ namespace BlenderLink
             {
                 StringBuilder builder = new StringBuilder();
                 //↓
-                //[Sub Data Markers][Control:ExportFlag][spacebar char][Type][spacebar char][Name of the object]
+                //[Sub Data Markers][Control:ExportFlag][spacebar char][Type][spacebar char][Name of the object][spacebar char][SpectialData]
                 builder.Append(new string('-', input.DataMarker+1));
                 //                  ↓
-                //[Sub Data Markers][Control:ExportFlag][spacebar char][Type][spacebar char][Name of the object]
+                //[Sub Data Markers][Control:ExportFlag][spacebar char][Type][spacebar char][Name of the object][spacebar char][SpectialData]
                 builder.Append(input.Import ? 'O' : 'X');
                 //                                      ↓
-                //[Sub Data Markers][Control:ExportFlag][spacebar char][Type][spacebar char][Name of the object]
+                //[Sub Data Markers][Control:ExportFlag][spacebar char][Type][spacebar char][Name of the object][spacebar char][SpectialData]
                 builder.Append(' ');
                 //                                                     ↓
-                //[Sub Data Markers][Control:ExportFlag][spacebar char][Type][spacebar char][Name of the object]
+                //[Sub Data Markers][Control:ExportFlag][spacebar char][Type][spacebar char][Name of the object][spacebar char][SpectialData]
                 builder.Append(input.Type.ToString());
                 //                                                           ↓
-                //[Sub Data Markers][Control:ExportFlag][spacebar char][Type][spacebar char][Name of the object]
+                //[Sub Data Markers][Control:ExportFlag][spacebar char][Type][spacebar char][Name of the object][spacebar char][SpectialData]
                 builder.Append(' ');
                 //                                                                          ↓
-                //[Sub Data Markers][Control:ExportFlag][spacebar char][Type][spacebar char][Name of the object]
+                //[Sub Data Markers][Control:ExportFlag][spacebar char][Type][spacebar char][Name of the object][spacebar char][SpectialData]
                 builder.Append(input.ObjectName);
+                if (input.SpectialData != "" && input.SpectialData != null)
+                {
+                    //                                                                                              ↓
+                    //[Sub Data Markers][Control:ExportFlag][spacebar char][Type][spacebar char][Name of the object][spacebar char][SpectialData]
+                    builder.Append('→');
+                    //                                                                                                             ↓
+                    //[Sub Data Markers][Control:ExportFlag][spacebar char][Type][spacebar char][Name of the object][spacebar char][SpectialData]
+                    builder.Append(input.SpectialData);
+                }
                 return builder.ToString();
             }
             #endregion
@@ -508,8 +549,15 @@ namespace BlenderLink
                     base.OnKeyUp(key);
                 }
             }
-            #endregion
-
+            #endregion            
+            /// <summary>
+            /// Determines whether [has type as parent] [the specified type].
+            /// </summary>
+            /// <param name="type">The type.</param>
+            /// <param name="hit">The hit.</param>
+            /// <returns>
+            ///   <c>true</c> if [has type as parent] [the specified type]; otherwise, <c>false</c>.
+            /// </returns>
             public bool HasTypeAsParent(ObjectType type,out Line hit)
             {
                 var p = this.Parent;
